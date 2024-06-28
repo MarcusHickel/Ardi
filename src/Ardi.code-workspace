@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "../../../../Rocketry/Avionics/Ardi/utsrocketryteam-software-course-5255855d9048/00-blink"
+		},
+		{
+			"name": "Ardi",
+			"path": ".."
+		},
+		{
+			"name": "Testing Project",
+			"path": "../../Testing Project"
+		},
+		{
+			"name": "240614-160025-arduino-blink",
+			"path": "../../240614-160025-arduino-blink"
+		},
+		{
+			"name": "Blink",
+			"path": "../../Blink"
+		},
+		{
+			"name": "Blinknano",
+			"path": "../../Blinknano"
+		},
+		{
+			"name": "UTS Rocketry Software course",
+			"path": "../../UTS Rocketry Software course"
+		}
+	],
+	"settings": {}
+}
