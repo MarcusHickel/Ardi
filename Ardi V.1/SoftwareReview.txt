@@ -1,0 +1,9 @@
+UTS rocketry Software course review 
+00-blink
+Lol my malware detection didn’t like me running pio test.
+Every test failed but im guessing cause im not running it on the same hardware from the Avionics workshop
+Ngl never have I ever so so much trouble getting a blink script to run but ok.
+Ok so a ran the test and somehow to buzzer was the only successful one (no buzzer is connected, and yes even flash failed)
+Ok im going to pause here. I think having the wrong hardware is fucking everything up.
+This might be redunant for software people but maybe a tutorial for using platformIO
+Explain how the test scripts where made?

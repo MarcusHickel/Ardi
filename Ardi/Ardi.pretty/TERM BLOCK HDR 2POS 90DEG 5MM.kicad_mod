@@ -1,0 +1,109 @@
+(footprint "TERM BLOCK HDR 2POS 90DEG 5MM"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at -8.128 7.112 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "49ad9c84-2bce-47ea-bbcf-9048c2595d5b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "TERM BLOCK HDR 2POS 90DEG 5MM"
+		(at 0 -7.62 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "340fe673-2cd4-4165-b11c-4983ce0d30b7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" "Ardi:TERM BLOCK HDR 2POS 90DEG 5MM"
+		(at 1.27 9.398 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "12174a62-31b6-4634-bbc0-4db71db9b407")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b392ff9a-fbd8-487b-9035-74e2c4cadfcd")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6b1bc8ee-6492-4125-9f45-b860210a4b48")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -5 6)
+		(end 5 -6)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "9723d9c9-9e29-4f2f-9ba1-664a748deefd")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 7.366 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "34984764-cdd2-49c3-9894-b9b1f43a63b1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -2.5 -4)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "1e6e8986-2dd7-4a60-a200-1444f9c7d088")
+	)
+	(pad "2" thru_hole circle
+		(at 2.5 -4)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b38e9379-2222-46dc-913c-1db60ebdadc2")
+	)
+)
