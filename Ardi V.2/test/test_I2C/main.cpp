@@ -13,16 +13,24 @@ void debug(byte address)
 	Serial.println(address, HEX);
 }
 
+void BMP280Check() {
+	TEST_ASSERT_TRUE(scanner.Check(0x69));
+}
+
+void ICM20948Check() {
+	TEST_ASSERT_TRUE(scanner.Check(0x76));
+}
+
 void setup() 
 {
-	Serial.begin(9600);
-	while (!Serial) {};
 
 	scanner.Init();
+	scanner.Execute(debug);
+	UNITY_BEGIN();
+	RUN_TEST(BMP280Check);
+	RUN_TEST(ICM20948Check);
+	UNITY_END();
+
 }
 
-void loop() 
-{
-	scanner.Execute(debug);
-	delay(5000);
-}
+void loop() {}
