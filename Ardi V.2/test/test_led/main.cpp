@@ -2,7 +2,7 @@
 #include <unity.h>
 
 void blink() {
-      // turn the LED on (HIGH is the voltage level)
+  // turn the LED on (HIGH is the voltage level)
   digitalWrite(LED_BUILTIN, HIGH);  delay(1000);
   digitalWrite(LED_BUILTIN, LOW);   delay(1000);
 
