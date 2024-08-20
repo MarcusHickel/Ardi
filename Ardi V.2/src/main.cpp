@@ -9,7 +9,7 @@
 // #include <Adafruit_ICM20X.h>
   
 typedef DFRobot_BMP280_IIC    BMP;
-BMP   bmp(&Wire, BMP::eSdoLow);
+BMP   bmp(&Wire, BMP::eSdoHigh);
 uint32_t BMP280pressure = 0;
 float BMP280temperature;
 
