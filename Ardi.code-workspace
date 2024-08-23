@@ -3,6 +3,10 @@
 		{
 			"name": "Ardi",
 			"path": ".."
+		},
+		{
+			"name": "ESP32-S3 Sandbox",
+			"path": "../../../PlatformIO/Projects/ESP32-S3 Sandbox"
 		}
 	],
 	"settings": {}

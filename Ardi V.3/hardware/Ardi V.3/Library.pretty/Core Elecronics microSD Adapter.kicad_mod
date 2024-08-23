@@ -1,0 +1,141 @@
+(footprint "Core Elecronics microSD Adapter"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 11.43 -9.144 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "29f7e3ad-1638-4e50-924d-915a4d4e9aee")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "Core Elecronics microSD Adapter"
+		(at 0.254 -11.43 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "c2c22adc-155d-46e2-ab3c-c477da5723bd")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d26920a6-f30d-4d89-8495-4c9c1fb3c1ad")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6ccb0352-aceb-44c0-9377-6d68372a385d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "81bf4c35-9e10-4cae-982f-e5c60aa96cf9")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -10 -9)
+		(end 10 9)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "fcda3f52-6f13-451d-a206-26db859a5ad6")
+	)
+	(fp_text user "${REFERENCE}"
+		(at -3.81 11.43 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "ce0a3fa9-2972-475b-9d5a-dabbd054d2b1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -7.62 -6.35)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "5dbc834e-4dd1-457f-8c56-421f48a4b24b")
+	)
+	(pad "2" thru_hole circle
+		(at -7.62 -3.81)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "96c7d3fb-cc9a-4e5b-957c-b76a66336c8e")
+	)
+	(pad "3" thru_hole circle
+		(at -7.62 -1.27)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8cc4ec77-e488-4d17-b685-5ebb8fabadaf")
+	)
+	(pad "4" thru_hole circle
+		(at -7.62 1.27)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "658f692e-22ba-490a-ad99-82b9de74e969")
+	)
+	(pad "5" thru_hole circle
+		(at -7.62 3.81)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "503e4a79-4aee-445b-90c4-927b1d82690b")
+	)
+	(pad "6" thru_hole circle
+		(at -7.62 6.35)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "0fc56a5e-8f09-4f60-90a8-e03d0c9ebd63")
+	)
+)
