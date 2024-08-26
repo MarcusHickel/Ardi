@@ -10,6 +10,8 @@
 #include <SD.h>
 // #include <FS.h>
 
+#include <TinyGPSPlus.h>
+
 #define LED_COUNT 1
 #define LED_PIN 21
 
@@ -22,6 +24,10 @@
 #define SPI_CSSD 10
 
 #define SPI_CSRF 11
+
+#define SERIAL_TX 5
+#define SERIAL_RX 4
+#define GPS_BAUD 9600
 
 WS2812FX ws2812fx = WS2812FX(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ800);
 
@@ -38,6 +44,9 @@ char testChar;
 
 const int chipSelect = 10;
 File dataFile;
+
+HardwareSerial gpsSerial(2);
+TinyGPSPlus gps;
 
 void FlashRed() {
   for (int i = 0; i < 3; i++) {
@@ -56,12 +65,40 @@ void FlashGreen() {
     ws2812fx.setColor(0x000000); 
     ws2812fx.service();
     delay(100);
-    ws2812fx.setColor(0x00FF00); // red 
+    ws2812fx.setColor(0x00FF00); // green 
     ws2812fx.service();
   }
 }
 
+void FlashGreenOrange() {
+  for (int i = 0; i < 2; i++) {
+    delay(100);
+    ws2812fx.setColor(0x000000); 
+    ws2812fx.service();
+    delay(100);
+    ws2812fx.setColor(0x00FF00); // green 
+    ws2812fx.service();
+  }
+    delay(100);
+    ws2812fx.setColor(0x000000); 
+    ws2812fx.service();
+    delay(100);
+    ws2812fx.setColor(0xFF3000); // orange 
+    ws2812fx.service();
+    delay(500); // Hold for a bit longer for visibility
+}
+
+   // Flash blue to indicate next module test 
+void SetLEDBlue() {
+  delay(200);
+  ws2812fx.setColor(0x0000FF); // BLUE 
+  ws2812fx.service();
+  delay(200);
+}
+
 void setup() {
+  gpsSerial.begin(GPS_BAUD, SERIAL_8N1, SERIAL_RX, SERIAL_TX); // Doing this now to give it time to warm up
+
   ws2812fx.init();
   ws2812fx.setBrightness(10);
   ws2812fx.setSpeed(100);
@@ -103,10 +140,7 @@ void setup() {
   }
 
   // Flash blue to indicate next module test 
-  delay(200);
-  ws2812fx.setColor(0x0000FF); // BLUE 
-  ws2812fx.service();
-  delay(200);
+  SetLEDBlue();
   
   //ICM20948 TEST
   icm.begin_I2C();
@@ -117,11 +151,7 @@ void setup() {
     FlashRed();
   }
 
-  delay(200);
-  ws2812fx.setColor(0x0000FF); // BLUE 
-  ws2812fx.service();
-  delay(200);
-
+  SetLEDBlue();
 
   SPI.begin(SPI_CLK,SPI_MISO,SPI_MOSI);
   //SDCARD Test
@@ -137,10 +167,49 @@ void setup() {
   }
   dataFile.close();
 
+  // Flash blue to indicate next module test 
+  SetLEDBlue();
+
+  // NEO-6M (GPS) Test
+  /* 
+  Tricky, Do I confirm that data is being received or that theres a lock?
+  What Ill do is repeat the green flash from previous test but end in orange 
+  if there is no lock
+  */
+  // gpsSerial.begin(GPS_BAUD, SERIAL_8N1, SERIAL_RX, SERIAL_TX); // Starting this earlier to give it time to 'warm up'
+  delay(1000);
+  while (gpsSerial.available() > 0) // Wait till data comes in
+  if (gps.encode(gpsSerial.read()));
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring."));
+    FlashRed();
+  } else if (!gps.location.isValid()) {FlashGreenOrange();}
+    else {FlashGreen();}
+  Serial.print("IsValid: "); Serial.println(gps.location.isValid());
+
+
+  // Testing Complete Set standby mode
+  ws2812fx.setColor(0x0000FF); // BLUE 
+  ws2812fx.service();
 }
 
 
 void loop() {
+  
+  ws2812fx.setColor(0x0000FF); // BLUE 
+  ws2812fx.service();
+  delay(100);
+  ws2812fx.setColor(0x000000);
+  ws2812fx.service();
+  delay(1000);
+  while (gpsSerial.available() > 0) // Wait till data comes in
+  if (gps.encode(gpsSerial.read()));
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring."));
+  }
+  Serial.print("IsValid: "); Serial.println(gps.location.isValid());
   // icm.getEvent(&accel, &gyro, &temp, &mag);
   // Serial.println("Hello world!");
   // Serial.println(accel.acceleration.x);
@@ -148,4 +217,47 @@ void loop() {
   // Serial.println(accel.acceleration.z);
   // Serial.println(bmp.getPressure());
   // delay(1000);
+  //   while (gpsSerial.available() > 0){
+  //   // get the byte data from the GPS
+  //   char gpsData = gpsSerial.read();
+  //   Serial.print(gpsData);
+  // }
+  // while (gpsSerial.available() > 0)
+  // Serial.println((gpsSerial.available()));
+  //   if (gps.encode(gpsSerial.read()));
+  // Serial.print(F("  Date/Time: "));
+  // if (gps.date.isValid())
+  // {
+  //   Serial.print(gps.date.day());
+  //   Serial.print(F("/"));
+  //   Serial.print(gps.date.month());
+  //   Serial.print(F("/"));
+  //   Serial.print(gps.date.year());
+  // }
+  // else
+  // {
+  //   Serial.print(F("INVALID"));
+  // }
+
+  // Serial.print(F(" "));
+  // if (gps.time.isValid())
+  // {
+  //   if (gps.time.hour() < 10) Serial.print(F("0"));
+  //   Serial.print(gps.time.hour());
+  //   Serial.print(F(":"));
+  //   if (gps.time.minute() < 10) Serial.print(F("0"));
+  //   Serial.print(gps.time.minute());
+  //   Serial.print(F(":"));
+  //   if (gps.time.second() < 10) Serial.print(F("0"));
+  //   Serial.print(gps.time.second());
+  //   Serial.print(F("."));
+  //   if (gps.time.centisecond() < 10) Serial.print(F("0"));
+  //   Serial.print(gps.time.centisecond());
+  // }
+  // else
+  // {
+  //   Serial.print(F("INVALID"));
+  // }
+  // delay(1000);
+  // Serial.println("-------------------------------");
 }
