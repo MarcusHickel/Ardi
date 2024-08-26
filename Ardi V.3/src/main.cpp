@@ -6,11 +6,22 @@
 
 #include <Adafruit_ICM20948.h>
 
+#include <SPI.h>
+#include <SD.h>
+// #include <FS.h>
+
 #define LED_COUNT 1
 #define LED_PIN 21
 
 #define I2C_SCL 1
 #define I2C_SDA 2
+
+#define SPI_CLK 7
+#define SPI_MISO 8
+#define SPI_MOSI 9
+#define SPI_CSSD 10
+
+#define SPI_CSRF 11
 
 WS2812FX ws2812fx = WS2812FX(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ800);
 
@@ -22,6 +33,11 @@ sensors_event_t accel;
 sensors_event_t gyro;
 sensors_event_t mag;
 sensors_event_t temp; // Unused
+
+char testChar;
+
+const int chipSelect = 10;
+File dataFile;
 
 void FlashRed() {
   for (int i = 0; i < 3; i++) {
@@ -79,13 +95,14 @@ void setup() {
   bmp.reset();
   bmp.begin();
   delay(50);
-  Serial.println(bmp.getPressure());
+  // Serial.println(bmp.getPressure());
   if (bmp.getPressure() > uint32_t(99315) & bmp.getPressure() < uint32_t(103315)) {
     FlashGreen();
   } else {
     FlashRed();
   }
-  
+
+  // Flash blue to indicate next module test 
   delay(200);
   ws2812fx.setColor(0x0000FF); // BLUE 
   ws2812fx.service();
@@ -100,15 +117,35 @@ void setup() {
     FlashRed();
   }
 
+  delay(200);
+  ws2812fx.setColor(0x0000FF); // BLUE 
+  ws2812fx.service();
+  delay(200);
+
+
+  SPI.begin(SPI_CLK,SPI_MISO,SPI_MOSI);
+  //SDCARD Test
+  SD.begin(SPI_CSSD);
+  if (SD.exists("/test.txt")) {SD.remove("/test.txt");}
+  File dataFile = SD.open("/test.txt", FILE_WRITE);
+  if (dataFile.print("testing...")) {
+    Serial.println("File written");
+    FlashGreen();
+  } else {
+    Serial.println("Write failed");
+    FlashRed();
+  }
+  dataFile.close();
+
 }
 
 
 void loop() {
-  icm.getEvent(&accel, &gyro, &temp, &mag);
-  Serial.println("Hello world!");
-  Serial.println(accel.acceleration.x);
-  Serial.println(accel.acceleration.y);
-  Serial.println(accel.acceleration.z);
-  Serial.println(bmp.getPressure());
-  delay(1000);
+  // icm.getEvent(&accel, &gyro, &temp, &mag);
+  // Serial.println("Hello world!");
+  // Serial.println(accel.acceleration.x);
+  // Serial.println(accel.acceleration.y);
+  // Serial.println(accel.acceleration.z);
+  // Serial.println(bmp.getPressure());
+  // delay(1000);
 }
