@@ -12,6 +12,8 @@
 
 #include <TinyGPSPlus.h>
 
+#include <RH_RF95.h>
+
 #define LED_COUNT 1
 #define LED_PIN 21
 
@@ -28,6 +30,10 @@
 #define SERIAL_TX 5
 #define SERIAL_RX 4
 #define GPS_BAUD 9600
+
+#define RF95_FREQ 433.0 // MUST BE WITHIN LEGALLY 
+#define RF_INT 15
+#define RF_RST 16
 
 WS2812FX ws2812fx = WS2812FX(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ800);
 
@@ -47,6 +53,8 @@ File dataFile;
 
 HardwareSerial gpsSerial(2);
 TinyGPSPlus gps;
+
+RH_RF95 rf95(SPI_CSRF, RF_INT);
 
 void FlashRed() {
   for (int i = 0; i < 3; i++) {
@@ -172,14 +180,12 @@ void setup() {
 
   // NEO-6M (GPS) Test
   /* 
-  Tricky, Do I confirm that data is being received or that theres a lock?
-  What Ill do is repeat the green flash from previous test but end in orange 
-  if there is no lock
+  3 Green flashes mean success, 2 green ending in orange means receving from module but invalid data (probably no lock)
   */
   // gpsSerial.begin(GPS_BAUD, SERIAL_8N1, SERIAL_RX, SERIAL_TX); // Starting this earlier to give it time to 'warm up'
-  delay(1000);
+  // delay(1000);
   while (gpsSerial.available() > 0) // Wait till data comes in
-  if (gps.encode(gpsSerial.read()));
+  if (gps.encode(gpsSerial.read())); // Pointless if statement 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
     Serial.println(F("No GPS detected: check wiring."));
@@ -187,6 +193,61 @@ void setup() {
   } else if (!gps.location.isValid()) {FlashGreenOrange();}
     else {FlashGreen();}
   Serial.print("IsValid: "); Serial.println(gps.location.isValid());
+
+  //LoRa RFM9x setup and test
+  // NOTE: BEST NOT TO SPEW OUT RF WHEN NOT TESTING THE MODULE
+  // pinMode(RF_RST, OUTPUT);
+  // digitalWrite(RF_RST, HIGH);
+  int16_t packetnum = 0;  // packet counter, we increment per xmission
+  delay(100);
+
+  Serial.println("LoRa TX Test!");
+
+  // manual reset
+  digitalWrite(RF_RST, LOW);
+  delay(10);
+  digitalWrite(RF_RST, HIGH);
+  delay(10);
+
+  while (!rf95.init()) {
+    Serial.println("LoRa radio init failed");
+    while (1);
+  }
+  Serial.println("LoRa radio init OK!");
+
+  // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
+  if (!rf95.setFrequency(RF95_FREQ)) {
+    Serial.println("setFrequency failed");
+    while (1);
+  }
+  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+  // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
+
+  // The default transmitter power is 13dBm, using PA_BOOST.
+  // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
+  // you can set transmitter powers from 5 to 23 dBm:
+  rf95.setTxPower(5, false);
+
+  Serial.println("Transmitting Test Message");
+  // Send a message to rf95_server
+  delay(2000);
+  char radiopacket[20] = "Hello World #      ";
+  itoa(packetnum++, radiopacket+13, 10);
+  Serial.print("Sending "); Serial.println(radiopacket);
+  radiopacket[19] = 0;
+  
+  Serial.println("Sending..."); delay(10);
+  rf95.send((uint8_t *)radiopacket, 20);
+
+  Serial.println("Waiting for packet to complete..."); delay(10);
+  rf95.waitPacketSent();
+  Serial.println("packet sent");
+  // Now wait for a reply
+  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+  uint8_t len = sizeof(buf);
+  
+
+
 
 
   // Testing Complete Set standby mode

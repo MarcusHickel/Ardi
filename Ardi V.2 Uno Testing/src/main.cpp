@@ -9,7 +9,7 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 
-#define RFM95_CS 4
+#define RFM95_CS 10
 #define RFM95_RST 2
 #define RFM95_INT 3
 
