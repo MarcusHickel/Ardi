@@ -12,7 +12,7 @@
 
 #include <TinyGPSPlus.h>
 
-#include <RH_RF95.h>
+#include <LoRa.h>
 
 #define LED_COUNT 1
 #define LED_PIN 21
@@ -23,17 +23,17 @@
 #define SPI_CLK 7
 #define SPI_MISO 8
 #define SPI_MOSI 9
-#define SPI_CSSD 10
+#define SPI_CSSD 10 // SD Card Chip Select
 
-#define SPI_CSRF 11
+#define SPI_CSRF 11 // LoRa Chip select
 
 #define SERIAL_TX 5
 #define SERIAL_RX 4
 #define GPS_BAUD 9600
 
-#define RF95_FREQ 433.0 // MUST BE WITHIN LEGALLY 
-#define RF_INT 15
-#define RF_RST 16
+#define LoRa_FREQ 433.0 // MUST BE WITHIN LEGALLY 
+#define LoRa_INT 15
+#define LoRa_RST 16
 
 WS2812FX ws2812fx = WS2812FX(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ800);
 
@@ -53,8 +53,6 @@ File dataFile;
 
 HardwareSerial gpsSerial(2);
 TinyGPSPlus gps;
-
-RH_RF95 rf95(SPI_CSRF, RF_INT);
 
 void FlashRed() {
   for (int i = 0; i < 3; i++) {
@@ -136,7 +134,7 @@ void setup() {
   // Set I2C Pins
   Wire.begin(I2C_SDA,I2C_SCL);
 
-  // BMP280 TEST
+  // ------ BMP280 TEST ------ //
   bmp.reset();
   bmp.begin();
   delay(50);
@@ -150,7 +148,7 @@ void setup() {
   // Flash blue to indicate next module test 
   SetLEDBlue();
   
-  //ICM20948 TEST
+  // ------ ICM20948 TEST ------ //
   icm.begin_I2C();
   icm.getEvent(&accel, &gyro, &temp, &mag);
   if (accel.acceleration.z > 0) { // Could make a more diverse test here
@@ -162,7 +160,7 @@ void setup() {
   SetLEDBlue();
 
   SPI.begin(SPI_CLK,SPI_MISO,SPI_MOSI);
-  //SDCARD Test
+  // ------ SDCARD Test ------ //
   SD.begin(SPI_CSSD);
   if (SD.exists("/test.txt")) {SD.remove("/test.txt");}
   File dataFile = SD.open("/test.txt", FILE_WRITE);
@@ -178,12 +176,11 @@ void setup() {
   // Flash blue to indicate next module test 
   SetLEDBlue();
 
-  // NEO-6M (GPS) Test
+  // ------ NEO-6M (GPS) Test ------ //
   /* 
   3 Green flashes mean success, 2 green ending in orange means receving from module but invalid data (probably no lock)
   */
   // gpsSerial.begin(GPS_BAUD, SERIAL_8N1, SERIAL_RX, SERIAL_TX); // Starting this earlier to give it time to 'warm up'
-  // delay(1000);
   while (gpsSerial.available() > 0) // Wait till data comes in
   if (gps.encode(gpsSerial.read())); // Pointless if statement 
   if (millis() > 5000 && gps.charsProcessed() < 10)
@@ -193,62 +190,28 @@ void setup() {
   } else if (!gps.location.isValid()) {FlashGreenOrange();}
     else {FlashGreen();}
   Serial.print("IsValid: "); Serial.println(gps.location.isValid());
+  
+  SetLEDBlue();
 
-  //LoRa RFM9x setup and test
-  // NOTE: BEST NOT TO SPEW OUT RF WHEN NOT TESTING THE MODULE
-  // pinMode(RF_RST, OUTPUT);
-  // digitalWrite(RF_RST, HIGH);
-  int16_t packetnum = 0;  // packet counter, we increment per xmission
-  delay(100);
-
+  //LoRa setup and test
   Serial.println("LoRa TX Test!");
+  LoRa.setPins(SPI_CSRF,LoRa_RST,LoRa_INT);
 
-  // manual reset
-  digitalWrite(RF_RST, LOW);
-  delay(10);
-  digitalWrite(RF_RST, HIGH);
-  delay(10);
-
-  while (!rf95.init()) {
+    while (!LoRa.begin(433E6)) { // 433MHz is the 70cm Amateur, make sure you got a licence
     Serial.println("LoRa radio init failed");
+    FlashRed();
     while (1);
   }
   Serial.println("LoRa radio init OK!");
 
-  // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
-  if (!rf95.setFrequency(RF95_FREQ)) {
-    Serial.println("setFrequency failed");
-    while (1);
-  }
-  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
-  // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-
-  // The default transmitter power is 13dBm, using PA_BOOST.
-  // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
-  // you can set transmitter powers from 5 to 23 dBm:
-  rf95.setTxPower(5, false);
-
-  Serial.println("Transmitting Test Message");
+  Serial.println("Sending Packet");
   // Send a message to rf95_server
-  delay(2000);
-  char radiopacket[20] = "Hello World #      ";
-  itoa(packetnum++, radiopacket+13, 10);
-  Serial.print("Sending "); Serial.println(radiopacket);
-  radiopacket[19] = 0;
-  
-  Serial.println("Sending..."); delay(10);
-  rf95.send((uint8_t *)radiopacket, 20);
 
-  Serial.println("Waiting for packet to complete..."); delay(10);
-  rf95.waitPacketSent();
-  Serial.println("packet sent");
-  // Now wait for a reply
-  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-  uint8_t len = sizeof(buf);
-  
-
-
-
+  // send packet
+  LoRa.beginPacket();
+  LoRa.print("LoRa Test");
+  LoRa.endPacket();
+  FlashGreen();
 
   // Testing Complete Set standby mode
   ws2812fx.setColor(0x0000FF); // BLUE 
@@ -271,6 +234,7 @@ void loop() {
     Serial.println(F("No GPS detected: check wiring."));
   }
   Serial.print("IsValid: "); Serial.println(gps.location.isValid());
+  Serial.print(gps.time.second());
   // icm.getEvent(&accel, &gyro, &temp, &mag);
   // Serial.println("Hello world!");
   // Serial.println(accel.acceleration.x);
